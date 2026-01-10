@@ -1,31 +1,34 @@
 from pathlib import Path
+from hashlib import sha256
 from os import rename
-import hashlib
 
 
 def main():
-    path = r""
-    actual_path = Path(path)
+    base_path = Path(__file__).parent
+    in_path = base_path.joinpath("in")
 
-    queue = [actual_path]
-    while queue:
-        current = queue.pop(0)
+    in_path.mkdir(exist_ok=True)
+
+    q: list[Path] = [in_path]
+
+    while q:
+        current = q.pop()
 
         if current.is_dir():
             for child in current.iterdir():
-                queue.append(child)
+                q.append(child)
         elif current.is_file():
-            h = hashlib.sha256(str(current.resolve()).encode("utf-8")).hexdigest()
+            with open(current, mode="br+") as file:
+                hash = sha256(file.read()).hexdigest()
 
-            suffix = current.suffix
-            parent = current.parent
-            target = parent / f"{h}{suffix}"
-            counter = 1
-            while target.exists():
-                target = parent / f"{h}_{counter}{suffix}"
-                counter += 1
+                file.close()
 
-            rename(str(current), str(target))
+            base_current = current.parent
+            try:
+                rename(current,
+                       base_current.joinpath(hash + "".join(current.suffixes)))
+            except FileExistsError:
+                current.unlink()
 
 
 if __name__ == '__main__':
