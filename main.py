@@ -12,6 +12,7 @@ def main():
     q: list[Path] = [in_path]
 
     while q:
+        print(f"current queue: {len(q)}")
         current = q.pop()
 
         if current.is_dir():
@@ -28,6 +29,7 @@ def main():
                 rename(current,
                        base_current.joinpath(hash + "".join(current.suffixes)))
             except FileExistsError:
+                print("Found Dupe")
                 current.unlink()
 
 
