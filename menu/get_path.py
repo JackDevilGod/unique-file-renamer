@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from help.delete_last_lines import erase_output_lines
+from menu.help.delete_last_lines import erase_output_lines
 
 def user_get_path() -> Path:
     print("Input directory you want this tool to work on")

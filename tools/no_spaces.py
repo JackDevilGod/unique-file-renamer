@@ -20,11 +20,15 @@ def no_spaces(base_path: Path, include_folder: bool = False) -> None:
             single_no_space(current)
         elif current.is_file():
             single_no_space(current)
+
+
+def no_spaces_folder(base_path: Path) -> None:
+    no_spaces(base_path, True)
             
 
 def single_no_space(base_path: Path) -> None:
-    name = base_path.suffix
-    no_spaces_name = "_".join(name.split(" "))
+    name = base_path.stem
+    no_spaces_name = "_".join(name.split(" ")) + base_path.suffix
     
     rename(base_path, base_path.parent.joinpath(no_spaces_name))
             
