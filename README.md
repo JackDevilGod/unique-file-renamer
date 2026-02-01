@@ -1,16 +1,43 @@
-# Unique File Renamer
+# File Organization & Renaming Tools
 
-A tool that deduplicates files by renaming them based on their SHA256 content hash.
+A collection of utility tools for organizing and renaming files in your directories with an interactive command-line interface.
 
-## How It Works
+## Overview
 
-The script recursively walks through all files in the `in/` directory and:
+This project provides several file manipulation tools that help you:
+- Clean up file names by removing spaces
+- Rename files based on their content hashes to identify duplicates
+- Work with any directory you choose
 
-1. **Computes a SHA256 hash** of each file's contents
-2. **Renames the file** to `<hash>.<original_extensions>` (preserving all file extensions)
-3. **Detects duplicates**: If two files have identical content, they produce the same hash. The second file is deleted since it's a duplicate.
+## Features
 
-This effectively deduplicates your directory structure while preserving file types through original extensions.
+### Tools Available
+
+1. **Remove Spaces from Filenames**
+   - Removes spaces from individual filenames
+   - Option to also clean up folder names
+   - Preserves file extensions and directory structure
+
+2. **Remove Spaces (Including Folders)**
+   - Comprehensive cleanup that renames both files and folders
+   - Useful for cleaning up entire directory structures
+   - Preserves nested hierarchy
+
+3. **Rename Files to Content Hash**
+   - Renames each file to a SHA256 hash of its contents
+   - Automatically removes duplicate files (files with identical content get the same hash)
+   - Preserves original file extensions
+   - Great for finding and removing duplicates
+
+4. **Exit**
+   - Terminates the application
+
+## Installation
+
+No external dependencies required! This project uses only Python's standard library.
+
+### Requirements
+- Python 3.9 or higher
 
 ## Usage
 
@@ -18,38 +45,78 @@ This effectively deduplicates your directory structure while preserving file typ
 python main.py
 ```
 
-Place files you want to deduplicate in the `in/` directory (or its subdirectories). The script will:
-- Traverse all subdirectories recursively
-- Rename each file based on its content hash
-- Remove duplicate files
-- Keep the directory structure intact
+The application will guide you through each step:
 
-## Example
+1. **Select a Directory**: Enter the path to the directory you want to work with
+2. **View Statistics**: See how many subfolders and files are in the selected directory
+3. **Choose a Tool**: Select from the available tools using the number corresponding to each option
+4. **Perform Action**: The selected tool will process the files
+5. **Continue**: You can select another tool or exit
 
-**Before:**
+## How It Works
+
+### PathContainer
+The `PathContainer` class manages the directory operations by:
+- Tracking the base path and counting total files and subfolders
+- Using a queue-based approach for recursive directory traversal
+- Providing statistics about the selected directory
+
+### Interactive Menu
+The `tool_menu` function provides an easy-to-use interface:
+- Displays available tools with numbered options
+- Handles user input validation
+- Clears previous output for a clean interface
+- Passes the selected path to the chosen tool function
+
+## File Tools
+
+### Removing Spaces
+The `no_spaces` function uses a breadth-first search approach to traverse directories and rename files/folders by replacing spaces with underscores. It handles nested structures and preserves file extensions.
+
+### Unique File Renaming
+The `unique_file_renamer` function:
+1. Reads each file's contents in binary mode
+2. Computes a SHA256 hash of the file content
+3. Renames the file to `<hash><original_extensions>`
+4. Automatically deletes files with duplicate hashes (same content = same hash)
+
+## Directory Traversal
+
+All tools use a queue-based traversal method that:
+- Processes directories recursively
+- Handles both files and subdirectories
+- Maintains the original directory structure
+- Processes items in a breadth-first order
+
+## Project Structure
+
 ```
-in/
-  image.png        (content: "ABC...")
-  copy_of_image.png (content: "ABC...")
-  document.txt     (content: "DEF...")
+.
+├── main.py                    # Main entry point
+├── README.md                  # This file
+├── tools/                     # File manipulation tools
+│   ├── no_spaces.py          # Remove spaces from filenames
+│   └── unique_file_renamer.py # Rename files by content hash
+├── pathing/                   # Directory handling utilities
+│   └── path_container.py     # PathContainer class
+├── menu/                      # Interactive menu components
+│   ├── get_path.py           # Path selection input
+│   ├── tool_select.py        # Tool selection menu
+│   └── help/
+│       └── delete_last_lines.py # Console output cleanup
 ```
 
-**After:**
-```
-in/
-  3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f.png
-  def1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab.txt
-```
+## Use Cases
 
-The duplicate `copy_of_image.png` is deleted because it has the same hash as `image.png`.
+- **Clean up filenames**: Remove spaces from file and folder names
+- **Duplicate detection**: Find and remove duplicate files by content
+- **File organization**: Rename files based on content for easier identification
+- **Archive management**: Process large collections of files consistently
 
-## Requirements
+## Benefits
 
-- Python 3.9+
-- Standard library only (no external dependencies)
-
-## Why Use This?
-
-- **Find duplicates**: Same content = same hash
-- **Free up space**: Automatically delete duplicate files
-- **Organize archives**: Useful for deduplicating photo/media libraries or backup folders
+- **No external dependencies**: Uses only Python standard library
+- **Interactive interface**: Easy-to-use menu system
+- **Recursive processing**: Handles entire directory structures
+- **Safe operations**: Preserves file extensions and directory hierarchy
+- **Flexible**: Choose different tools or chain them together
