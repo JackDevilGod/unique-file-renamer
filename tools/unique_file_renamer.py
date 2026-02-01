@@ -1,25 +1,20 @@
-from pathlib import Path
 from hashlib import sha256
 from os import rename
+from pathlib import Path
+from queue import Queue
 
-from menu.get_path import user_get_path
-from pathing.path_container import PathContainer
 
-
-def main():
-    user_path = user_get_path()
-
-    contained_user_path = PathContainer(user_path)
-
-    q: list[Path] = []
-
-    while q:
-        print(f"current queue: {len(q)}")
-        current = q.pop()
-
+def unique_file_renamer(base_path: Path) -> None:
+    q: Queue[Path] = Queue()
+    q.put(base_path)
+    
+    while not q.empty():
+        current = q.get()
+        
         if current.is_dir():
             for child in current.iterdir():
-                q.append(child)
+                q.put(child)
+        
         elif current.is_file():
             with open(current, mode="br+") as file:
                 hash = sha256(file.read()).hexdigest()
@@ -31,9 +26,4 @@ def main():
                 rename(current,
                        base_current.joinpath(hash + "".join(current.suffixes)))
             except FileExistsError:
-                print("Found Dupe")
                 current.unlink()
-
-
-if __name__ == '__main__':
-    main()
