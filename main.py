@@ -2,14 +2,12 @@ from pathlib import Path
 from hashlib import sha256
 from os import rename
 
+from menu.get_path import user_get_path
 
 def main():
-    base_path = Path(__file__).parent
-    in_path = base_path.joinpath("in")
+    user_path = user_get_path()
 
-    in_path.mkdir(exist_ok=True)
-
-    q: list[Path] = [in_path]
+    q: list[Path] = []
 
     while q:
         print(f"current queue: {len(q)}")
